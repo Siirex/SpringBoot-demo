@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+   
+   <head>
+      <title>User Info</title>
+   </head>
+   
+   <body>
+      
+      <th:block th:include="/_menu"></th:block>
+      
+      <h2>User Informations Page</h2>
+      
+      <h3>Welcome : <span th:utext="${#request.userPrincipal.name}"></span></h3>
+      
+      <b>This is protected page!</b>  
+      
+      <br/><br/>
+      
+      <!-- Table: List admin -->
+      <h2>List User Accounts</h2>    
+      <table border="1">
+            <tr>
+               <th>User ID</th>
+               <th>Username</th>
+               <th>Password</th>
+            </tr>
+            <tr th:each ="member : ${members}">
+               <td th:utext="${member.userId}">...</td>
+               <td th:utext="${member.userName}">...</td>
+               <td th:utext="${member.encrytedPassword}">...</td>
+            </tr>
+      </table>
+      
+      <br/><br/>
+      
+      <!-- Button: Create account new -->
+      <a th:href="@{/createUserAccount}">Create New Account</a>
+      
+      <br/><br/>
+      
+      <!-- Web utils: information of this User logined -->
+      <div th:if="${userInfo != null}" th:utext="${userInfo}"></div>
+ 
+   </body>
+   
+</html>

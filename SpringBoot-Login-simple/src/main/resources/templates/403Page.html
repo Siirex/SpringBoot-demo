@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+	<head>
+		<title>Access Denied</title>
+	</head>
+	
+	<body>
+	    
+	    <th:block th:include="/_menu"></th:block>
+	
+	    <!-- Message alarm -->
+	    <h3 th:if="${message != null}" th:utext="${message}" style="color:red;"></h3>
+	
+	    <!-- Web utils: information of this User logined -->
+	    <div th:if="${userInfo != null}" th:utext="${userInfo}"></div>
+	    
+	</body>
+
+</html>
