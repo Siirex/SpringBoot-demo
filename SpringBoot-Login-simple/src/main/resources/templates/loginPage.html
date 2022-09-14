@@ -15,7 +15,6 @@
       <!-- /login?error=true -->
       <div th:if="${#request.getParameter('error') == 'true'}" style="color:red;margin:10px 0px;">
          Login Failed!!!<br/>
-         Reason :
          <span th:if="${#session!= null and #session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION') != null}"
          th:utext="${#session.getAttribute('SPRING_SECURITY_LAST_EXCEPTION').message}">
          </span>
@@ -27,11 +26,11 @@
          <table>
             <tr>
                <td>User:</td>
-               <td><input type='text' placeholder="Enter Username" name='username' value=''></td>
+               <td><input type='text' placeholder="Enter Username" name='username' th:value="${defaultUsername}"/></td>
             </tr>
             <tr>
                <td>Password:</td>
-               <td><input type='password' placeholder="Enter Username" name='password' /></td>
+               <td><input type='password' placeholder="Enter Username" name='password' th:value="${defaultPassword}"/></td>
             </tr>          
             <tr>
                <td><input name="submit" type="submit" value="submit" /></td>

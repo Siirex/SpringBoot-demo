@@ -12,11 +12,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import Siirex.entity.AppRole;
 import Siirex.entity.AppUser;
+import Siirex.entity.GrantRole;
 import Siirex.entity.UserAccounts;
 import Siirex.repository.AppRoleRepo;
 import Siirex.repository.AppUserRepo;
 import Siirex.repository.AppUserRepoInterface;
+import Siirex.repository.GrantRoleRepo;
 import Siirex.repository.UserAccountsRepo;
 
 /**
@@ -83,6 +86,10 @@ public class UserAccountsService implements UserDetailsService {
 		UserDetails userDetails = userNeedToFind;
 		return userDetails;
 	}
+
+	public AppUser getAppUserDefault(String username) {
+		return userRepo.findUserByUsernameOnDatabase(username);
+	}
 	
 	/* --------------------------- */
 	/* List & Create new Accounts */
@@ -90,15 +97,13 @@ public class UserAccountsService implements UserDetailsService {
 	
 	@Autowired
 	private AppUserRepoInterface repositoryInterface;
-	
+
 	@Autowired
 	private UserAccountsRepo userAccountRepo;
-	
-	// Get ID user max
-	public Long getMaxIdOfAppUser() {
-		Long idmax = repositoryInterface.getMaxIdOfAppUser();
-		return idmax;
-	}
+
+	/* ------------------- */
+	/* List User accounts */
+	/* ----------------- */
 	
 	// List all accounts
 	public List<AppUser> ListAllUserAccounts() {
@@ -114,11 +119,41 @@ public class UserAccountsService implements UserDetailsService {
 		return listAcc;
 	}
 	
-	// Create new User account
-	public void createAppUser(UserDetails newUser) {
-		
-		this.repositoryInterface.save((AppUser) newUser);
+	/* ---------------- */
+	/* Create new User */
+	/* -------------- */
+	
+	// Get ID user max
+	public Long getMaxIdOfAppUser() {
+		Long idmax = repositoryInterface.getMaxIdOfAppUser();
+		return idmax;
 	}
 	
-	// Create new Role for new User account
+	// Save object to DB throw merge() & persist()
+	public void Save(AppUser newUser) {
+		// userAccountRepo.save(user);
+		this.repositoryInterface.save(newUser);
+	}
+	
+	/* ------------------------ */
+	/* Grant Role for new User */
+	/* ---------------------- */
+
+	@Autowired
+	private GrantRoleRepo repoGrantRole;
+	
+	// Get ID max of GrantUser
+	public Long getMaxIdOfGrantRole() {
+		Long idmax = repoGrantRole.getMaxIdOfGrantRole();
+		return idmax;
+	}
+	
+	public AppRole getRoleObjectByRoleName(String roleName) {
+		AppRole roleObject = roleRepo.getRoleObjectByRoleName(roleName);
+		return roleObject;
+	}
+	
+	public void SaveRoleForNewUser(GrantRole role) {
+		this.repoGrantRole.SaveCustom(role);
+	}
 }

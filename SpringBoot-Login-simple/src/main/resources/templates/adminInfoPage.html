@@ -18,10 +18,24 @@
       
       <br/><br/>
       
-      <!-- Table: List admin -->
+      <h2>List User Accounts</h2>    
+      <table border="1">
+            <tr>
+               <th>User ID</th>
+               <th>Username</th>
+               <th>Password</th>
+            </tr>
+            <tr th:each ="member : ${members}">
+               <td th:utext="${member.userId}">...</td>
+               <td th:utext="${member.userName}">...</td>
+               <td th:utext="${member.encrytedPassword}">...</td>
+            </tr>
+      </table>
       
+      <br/><br/>
+
       <!-- Button: Create account new -->
-      <a th:href="@{/createUserAccount}">Create New Account</a>
+      <a th:href="@{/createUserAccount?admin=true}">Create New Account</a>
       
       <br/><br/>
       

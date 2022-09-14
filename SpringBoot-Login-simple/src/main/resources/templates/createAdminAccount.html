@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+   
+   <head>
+      <title>Register</title>
+   </head>
+   
+   <body>
+      
+      <th:block th:include="/_menu"></th:block>
+      
+      <h1 style="color:green;">Create New Admin Account</h1>
+
+      <h3>Please fill in this form to create an account:</h3>
+      
+      <form name='f' th:action="@{/createUserAccount?admin=true}" th:object="${firstObject}" method='POST'>
+         <table>
+            <tr>
+               <td>User:</td>
+               <td><input type='text' placeholder="Enter Username" th:field="*{userName}" /></td>
+            </tr>
+            <tr>
+               <td>Password:</td>
+               <td><input type='password' placeholder="Enter Password" th:field="*{encrytedPassword}" /></td>
+            </tr>          
+            <tr>
+               <td><input type="submit" name="submit" value="Register" /></td>
+            </tr>
+         </table>
+      </form>
+      
+   </body>
+   
+</html>

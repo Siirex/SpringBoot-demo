@@ -2,7 +2,6 @@ package Siirex.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -18,7 +17,6 @@ import lombok.Data;
 public class AppRole {
 
 	@Id
-	@GeneratedValue
 	@Column(name = "ROLE_ID", nullable = false)
 	private Long roleId;
 	

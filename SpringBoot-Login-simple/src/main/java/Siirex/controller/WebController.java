@@ -12,8 +12,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import Siirex.entity.AppRole;
 import Siirex.entity.AppUser;
+import Siirex.entity.GrantRole;
+import Siirex.entity.UserAccounts;
 import Siirex.service.UserAccountsService;
 import Siirex.utils.WebappUtils;
 
@@ -24,6 +28,9 @@ public class WebController {
 
 	@Autowired
 	private UserAccountsService service;
+	
+	@Autowired
+	private PasswordEncoder passEncoder;
 	
 	/* --------------------------------- */
 	/* Controller request for Home page */
@@ -38,7 +45,12 @@ public class WebController {
 	
 	@GetMapping(value = "/login")
 	public String loginPage(Model model) {
-
+		
+		AppUser defaultUser = service.getAppUserDefault("user1");
+		System.out.println("Default user: " + defaultUser);
+		model.addAttribute("defaultUsername", defaultUser.getUserName());
+		model.addAttribute("defaultPassword", 123456);
+		
 		return "loginPage";
 	}
 	
@@ -55,15 +67,17 @@ public class WebController {
 	@GetMapping(value = "/userInfo")
 	public String userInfoPage(Model model, Principal principal) {
 
-		// List all accounts
-		List<AppUser> listUser = service.ListAllUserAccounts();
-		model.addAttribute("members", listUser);
+		// List accounts with ROLE_USER (has id: 2L)
+		List<UserAccounts> listUser = service.ListUserAccounts(2L);
 		
-		/** List accounts with ROLE_USER
-		List<UserAccounts> listUser = userAccountsService.ListUserAccounts(2L); // roleId for user-account is 2L
-		System.out.println("List User: " + listUser);
-		model.addAttribute("members", listUser);
-		*/
+		if (listUser != null) {
+			model.addAttribute("members", listUser);
+
+		} else {
+			// List all accounts
+			List<AppUser> listAllUser = service.ListAllUserAccounts();
+			model.addAttribute("members", listAllUser);
+		}
 		
 		// Lấy đối tượng User vừa Login thành công (thông qua đối tượng Principal đó)
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
@@ -82,8 +96,17 @@ public class WebController {
 	@GetMapping(value = "/adminInfo")
 	public String adminInfoPage(Model model, Principal principal) {
 		
-		/** List accounts with ROLE_ADMIN
-		*/
+		// List accounts with ROLE_ADMIN (has id: 1L)
+		List<UserAccounts> listUser = service.ListUserAccounts(1L);
+		
+		if (listUser != null) {
+			model.addAttribute("members", listUser);
+
+		} else {
+			// List all accounts
+			List<AppUser> listAllUser = service.ListAllUserAccounts();
+			model.addAttribute("members", listAllUser);
+		}
 		
 		User loginedUser = (User) ((Authentication) principal).getPrincipal();
 
@@ -120,19 +143,52 @@ public class WebController {
 	/* -------------------------------------- */
 	
 	@GetMapping(value = "/createUserAccount")
-	public String createAccount(Model mode) {
+	public String createAccount(Model mode, @RequestParam(name = "admin") Boolean admin) {
 		
 		mode.addAttribute("firstObject", new AppUser());
-		return "createAccount";
+		
+		if (admin == false) {
+			return "createUserAccount";
+		} else {
+			return "createAdminAccount";
+		}
 	}
-	
-	@Autowired
-	private PasswordEncoder passEncoder;
-	
+
 	@PostMapping(value = "/createUserAccount")
-	public void addUserAccount(@ModelAttribute AppUser lastObject) {
+	public String addUserAccount(@ModelAttribute AppUser lastObject, @RequestParam(name = "admin") Boolean admin) {
+
+		// Create new user
 		AppUser newUser = new AppUser();
+		newUser.setUserId(service.getMaxIdOfAppUser() + 1L);
 		newUser.setUserName(lastObject.getUserName());
 		newUser.setEncrytedPassword(passEncoder.encode(lastObject.getEncrytedPassword()));
+		System.out.println("New user: " + newUser);
+		
+		// New record for AppUser entity / APP_USER table
+		service.Save(newUser);
+				
+		// Grant fole for new User
+		AppRole roleOfUser = null;
+		
+		if (admin == false) {
+			roleOfUser = service.getRoleObjectByRoleName("ROLE_USER");
+		} else {
+			roleOfUser = service.getRoleObjectByRoleName("ROLE_ADMIN");
+		}
+		
+		GrantRole role = new GrantRole();
+		role.setId(service.getMaxIdOfGrantRole() + 1L);
+		role.setAppUser(newUser);
+		role.setAppRole(roleOfUser);
+		System.out.println("Grant fole for new User: " + role);
+		
+		// New record for GrantRole entity / GRANT_ROLE table
+		service.SaveRoleForNewUser(role);
+		
+		if (admin == false) {
+			return "redirect:/userInfo";
+		} else {
+			return "redirect:/adminInfo";
+		}
 	}
 }
