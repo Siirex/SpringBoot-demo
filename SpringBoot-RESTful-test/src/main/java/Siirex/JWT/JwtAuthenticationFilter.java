@@ -17,8 +17,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * - JwtAuthenticationFilter: Có nhiệm vụ kiểm tra request của Client trước khi nó tới Servlet (Controller).
- * - Nó sẽ lấy Authorization header ra và kiểm tra xem JWT Token được Client gửi lên có hợp lệ không?!
+ * - JwtAuthenticationFilter: Có nhiệm vụ kiểm tra request của Client trước khi
+ * nó tới Servlet (Controller).
+ * - Nó sẽ lấy Authorization header ra và kiểm tra xem JWT Token được Client gửi
+ * lên có hợp lệ không?!
  */
 
 @Slf4j
@@ -44,10 +46,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        FilterChain filterChain
-    ) throws ServletException, IOException {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
 
         try {
             // Lấy token từ request
@@ -63,21 +64,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // Nếu lấy được User, nghĩa là thông tin trích xuất từ Token là hợp lệ, thì ...
                 if (userDetails != null) {
-                    // Set đối tượng Authentication (thông tin authentication của principal) cho Seturity Context
-                    UsernamePasswordAuthenticationToken authentication
-                        = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); // set thêm trường Details
+                    // Set đối tượng Authentication (thông tin authentication của principal) cho
+                    // Seturity Context
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request)); // set thêm
+                                                                                                           // trường
+                                                                                                           // Details
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
                 } else {
                     System.out.println("Thông tin extract từ Token không hợp lệ --> Token không hợp lệ!");
                 }
+            } else {
+                SecurityContextHolder.clearContext();
             }
 
         } catch (Exception e) {
             log.error("Failed on set user authentication!", e);
         }
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }
